@@ -1,18 +1,21 @@
 import requests
-import time
 import pandas as pd
 from PIL import Image
 import streamlit as st
 import warnings
 from io import BytesIO
-# import plotly.express as px
 warnings.filterwarnings('ignore')
 
 def main():
 
-    profile_icon = r"C:\Bankbenchers\PythonProject\lgd_hierarchy\Data\img_1.png"
 
-    st.set_page_config(page_title="LGD Search Hierarchy", page_icon=profile_icon)
+    profile_icon = "https://raw.githubusercontent.com/sjpradhan/lgd_hierarchy/main/Data/img_1.png"
+
+    # Fetch the image from URL
+    response = requests.get(profile_icon)
+    image = Image.open(BytesIO(response.content))
+
+    st.set_page_config(page_title="LGD Search Hierarchy", page_icon=image)
 
     st.title(":rainbow[LGD Hierarchy Data]🗺️")
 
@@ -56,7 +59,8 @@ def main():
     try:
         @st.cache_data
         def load_state_data():
-            state_df = pd.read_csv(r"C:\Bankbenchers\PythonProject\lgd_hierarchy\Data\State Details.csv")
+            state_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/State%20Details.csv"
+            state_df = pd.read_csv(state_url)
 
             state_df = state_df[["State LGD Code", "State Name (In English)", "State Name (In Local language)", "State or UT",
             "Census2011 Code"]]
@@ -99,7 +103,8 @@ def main():
     try:
         @st.cache_data
         def load_district_data():
-            district_df = pd.read_csv(r"C:\Bankbenchers\PythonProject\lgd_hierarchy\Data\District Details.csv")
+            district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/District%20Details.csv"
+            district_df = pd.read_csv(district_url)
 
             district_df = district_df[
                 ["District LGD Code", "District Name (In English)", "District Name (In Local language)",
@@ -135,7 +140,8 @@ def main():
     try:
         @st.cache_data
         def load_sub_district_data():
-            sub_district_df = pd.read_csv(r"C:\Bankbenchers\PythonProject\lgd_hierarchy\Data\Sub-districts Details.csv")
+            sub_district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Sub-districts%20Details.csv"
+            sub_district_df = pd.read_csv(sub_district_url)
 
             sub_district_df = sub_district_df[["Sub-District LGD Code","Sub-District Name (In English)",
             "Sub-District Name (In Local language)","Hierarchy","Census2011 Code", "Pesa Status"]]
@@ -182,7 +188,8 @@ def main():
     try:
         @st.cache_data
         def load_village_data():
-            village_df = pd.read_csv(r"C:\Bankbenchers\PythonProject\lgd_hierarchy\Data\Village Details.csv")
+            village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
+            village_df = pd.read_csv(village_url)
             village_df = village_df[["State Code","State Name (In English)","District Code","District Name (In English)",
                         "Sub-District Code","Sub-District Name (In English)","Village Code","Village Version",
                         "Village Name (In English)","Village Name (In Local)","Village Status","Census 2011 Code"]]
@@ -225,6 +232,53 @@ def main():
         pass
 
     st.markdown("---")
+
+    @st.cache_data
+    def loading_district_data():
+        district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/District%20Details.csv"
+        district_df = pd.read_csv(district_url)
+        district_df["Hierarchy"] = district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
+            0).str.strip()
+        districts_count = district_df["Hierarchy"].value_counts().reset_index()
+        return districts_count
+    districts_count = loading_district_data()
+
+    @st.cache_data
+    def loading_sub_district_data():
+        sub_district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Sub-districts%20Details.csv"
+        sub_district_df = pd.read_csv(sub_district_url)
+        sub_district_df = sub_district_df[["Hierarchy"]]
+        sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
+            1).str.strip()
+        sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace("District\) / ", "", regex=True)
+        sub_district_count = sub_district_df["Hierarchy"].value_counts().reset_index()
+        replacements = {
+            "Bhabua)": "Bihar",
+            "East Nimar)": "Madhya Pradesh",
+            "West Nimar)": "Madhya Pradesh"
+        }
+        sub_district_count["Hierarchy"] = sub_district_count["Hierarchy"].replace(replacements)
+        sub_district_count = sub_district_count.groupby("Hierarchy")["count"].sum().reset_index()
+        return sub_district_count
+    sub_district_count = loading_sub_district_data()
+
+    def loading_village_data():
+        village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
+        village_df = pd.read_csv(village_url)
+        village_df = village_df[["State Name (In English)"]]
+        village_count = village_df["State Name (In English)"].value_counts().reset_index()
+
+        df_merge = pd.merge(districts_count, sub_district_count, how="left", on="Hierarchy")
+        df_merge = pd.merge(df_merge, village_count, how="left", left_on="Hierarchy", right_on="State Name (In English)")
+        stats_table = df_merge[["Hierarchy", "count_x", "count_y", "count"]]
+        stats_table["count"].fillna(0, inplace=True)
+        stats_table["count"] = stats_table["count"].astype(int)
+        rename_column = ["States", "Districts", "Sub-Districts", "Villages"]
+        stats_table.columns = rename_column
+        return stats_table
+    stats_table = loading_village_data()
+
+    st.table(stats_table)
 
 # Footer
     st.markdown(
