@@ -262,6 +262,7 @@ def main():
         return sub_district_count
     sub_district_count = loading_sub_district_data()
 
+    @st.cache_data
     def loading_village_data():
         village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
         village_df = pd.read_csv(village_url)
