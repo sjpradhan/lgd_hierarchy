@@ -357,14 +357,14 @@ def main():
 
     st.divider()
 
-    # col1,col2 = st.columns(2)
-    #
-    # top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
-    # fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
-    # fig.update_layout(annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)])
-    #
-    # with col1:
-    #     st.plotly_chart(fig)
+    col1,col2 = st.columns(2)
+
+    top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
+    fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+    fig.update_layout(annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)])
+
+    with col1:
+        st.plotly_chart(fig)
     #
     # top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
     # fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
