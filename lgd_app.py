@@ -4,10 +4,10 @@ from PIL import Image
 import streamlit as st
 import warnings
 from io import BytesIO
+import plotly.graph_objects as go
 warnings.filterwarnings('ignore')
 
 def main():
-
 
     profile_icon = "https://raw.githubusercontent.com/sjpradhan/lgd_hierarchy/main/Data/img_1.png"
 
@@ -18,8 +18,6 @@ def main():
     st.set_page_config(page_title="LGD Search Hierarchy", page_icon=image)
 
     st.title(":rainbow[LGD Hierarchy Data]🗺️")
-
-    st.divider()
 
     try:
         st.markdown(
@@ -48,6 +46,80 @@ def main():
     except Exception as e:
         pass
 
+    st.divider()
+
+    try:
+        @st.cache_data
+        def load_state_data():
+            state_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/State%20Details.csv"
+            state_df = pd.read_csv(state_url)
+            state_df = state_df[["State LGD Code"]]
+            return state_df
+        state_df = load_state_data()
+
+        @st.cache_data
+        def load_district_data():
+            district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/District%20Details.csv"
+            district_df = pd.read_csv(district_url)
+            district_df = district_df[["District LGD Code"]]
+            return district_df
+        district_df = load_district_data()
+
+        @st.cache_data
+        def load_sub_district_data():
+            sub_district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Sub-districts%20Details.csv"
+            sub_district_df = pd.read_csv(sub_district_url)
+            sub_district_df = sub_district_df[["Sub-District LGD Code"]]
+            sub_district_df["Sub-District LGD Code"] = sub_district_df["Sub-District LGD Code"].astype(str)
+            return sub_district_df
+        sub_district_df = load_sub_district_data()
+
+        @st.cache_data
+        def load_village_data():
+            village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
+            village_df = pd.read_csv(village_url)
+            village_df = village_df[["Village Code",]]
+            village_df["Village Code"] = village_df["Village Code"].astype(str)
+            return village_df
+        village_df = load_village_data()
+
+        col1, col2, col3,col4 = st.columns(4)
+
+        with col1:
+            unique_state = state_df["State LGD Code"].nunique()
+            st.metric(label= "**States / Union Territories**", value = unique_state)
+
+        with col2:
+            unique_district = district_df["District LGD Code"].nunique()
+            st.metric(label="**Districts**", value=unique_district)
+
+        with col3:
+            unique_sub_district = sub_district_df["Sub-District LGD Code"].nunique()
+            st.metric(label="**Sub-Districts**", value=unique_sub_district)
+
+        with col4:
+            unique_villages = village_df["Village Code"].nunique()
+            st.metric(label="**Villages**", value=unique_villages)
+    except Exception as e:
+        st.error(f"error in KPI,{e}")
+        pass
+
+    try:
+        st.markdown(
+            """
+            <style>
+            .spacer {
+                margin-top: 10px;
+            }
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        # Add a spacer div to create space
+        st.markdown('<div class="spacer"></div>', unsafe_allow_html=True)
+    except Exception as e:
+        pass
+
     try:
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -68,6 +140,7 @@ def main():
             return state_df
 
         state_df = load_state_data()
+
 
         # Filter based on State Name & it's LGD code
         if search_term:
@@ -226,12 +299,12 @@ def main():
         st.subheader(":orange[Villages Data Preview]🫣",divider="rainbow")
         ":green[Rows & Columns In Villages]", village_df.shape
         st.write(village_df.head())
-        st.caption("Update till June 2024, To get latest LGD Data Please visit LGD Official site.")
+
     except Exception as e:
         st.error(f"error in village data,{e}")
         pass
 
-    st.markdown("---")
+    st.subheader(":orange[State Wise Records📈]", divider="rainbow")
 
     @st.cache_data
     def loading_district_data():
@@ -280,6 +353,41 @@ def main():
     stats_table = loading_village_data()
 
     st.table(stats_table)
+    st.caption("Update till June 2024, To get latest LGD Data Please visit LGD Official site.")
+
+    st.divider()
+
+    col1,col2 = st.columns(2)
+
+    with col1:
+        top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
+
+        fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+        fig.update_layout(
+            annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)]
+        )
+        st.plotly_chart(fig)
+
+    with col2:
+        top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
+
+        fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
+
+        fig.update_layout(
+            annotations=[dict(text='Sub-Districts', x=0.5, y=0.5, font_size=16, showarrow=False)]
+        )
+        st.plotly_chart(fig)
+
+    top_villages = stats_table[['States', 'Villages']].sort_values(by='Villages', ascending=False).head(10)
+
+    fig = go.Figure(data=[go.Bar(x=top_villages['States'], y=top_villages['Villages'])])
+    fig.update_layout(
+        title='Top 10 States by most Villages',
+        xaxis_title='States',
+        yaxis_title='Number of Villages'
+    )
+
+    st.plotly_chart(fig)
 
 # Footer
     st.markdown(
