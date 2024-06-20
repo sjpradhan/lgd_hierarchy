@@ -361,7 +361,10 @@ def main():
 
     top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
     fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
-    fig.update_layout(annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)])
+    fig.update_layout(
+        annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)]
+    )
+    fig.update_traces(hole=0.6)
 
     with col1:
         st.plotly_chart(fig)
