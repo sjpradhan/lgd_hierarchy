@@ -357,40 +357,31 @@ def main():
 
     st.divider()
 
-    col1,col2 = st.columns(2)
-
-    top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
-
-    with col1:
-
-        fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
-        fig.update_layout(
-            annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)]
-        )
-        st.plotly_chart(fig)
-
-    top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
-
-    with col2:
-
-        fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
-
-        fig.update_layout(
-            annotations=[dict(text='Sub-Districts', x=0.5, y=0.5, font_size=16, showarrow=False)]
-        )
-        st.plotly_chart(fig)
-
-    top_villages = stats_table[['States', 'Villages']].sort_values(by='Villages', ascending=False).head(10)
-
-    fig = go.Figure(data=[go.Bar(x=top_villages['States'], y=top_villages['Villages'])])
-    fig.update_layout(
-        title='Top 10 States by most Villages',
-        xaxis_title='States',
-        yaxis_title='Number of Villages'
-    )
-
-    st.plotly_chart(fig)
-
+    # col1,col2 = st.columns(2)
+    #
+    # top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
+    # fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+    # fig.update_layout(annotations=[dict(text='Districts', x=0.5, y=0.5, font_size=16, showarrow=False)])
+    #
+    # with col1:
+    #     st.plotly_chart(fig)
+    #
+    # top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
+    # fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
+    # fig.update_layout(annotations=[dict(text='Sub-Districts', x=0.5, y=0.5, font_size=16, showarrow=False)])
+    #
+    # with col2:
+    #     st.plotly_chart(fig)
+    #
+    # top_villages = stats_table[['States', 'Villages']].sort_values(by='Villages', ascending=False).head(10)
+    #
+    # fig = go.Figure(data=[go.Bar(x=top_villages['States'], y=top_villages['Villages'])])
+    # fig.update_layout(
+    #     title='Top 10 States by most Villages',
+    #     xaxis_title='States',
+    #     yaxis_title='Number of Villages'
+    # )
+    # st.plotly_chart(fig)
 
 # Footer
     st.markdown(
