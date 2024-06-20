@@ -359,13 +359,16 @@ def main():
 
     col1,col2 = st.columns(2)
 
-    top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
-    fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
-    # fig.update_layout(title='Top 10 States most Districts')
-    fig.update_traces(hole=0.6)
-
-    with col1:
-        st.plotly_chart(fig)
+    try:
+        top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
+        fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+        # fig.update_layout(title='Top 10 States most Districts')
+        fig.update_traces(hole=0.6)
+        with col1:
+            st.plotly_chart(fig)
+    except Exception as e:
+        st.error(f"an error occur,{e}")
+        pass
     #
     # top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
     # fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
