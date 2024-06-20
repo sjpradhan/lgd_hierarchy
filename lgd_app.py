@@ -421,7 +421,7 @@ def main():
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     <a href="https://www.linkedin.com/in/sjpradhan"><img src="https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/linkedin.png" width="30" height="30"></a>
                 <div style="text-align: center;">
-                    <p style="margin: 0;">© 2024 Sj Pradhan. All rights reserved.</p>
+                    <p style="margin: 0;">© 2024 sj-lgd.</p>
                 </div>
             </div>
         </div>
