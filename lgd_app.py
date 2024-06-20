@@ -101,7 +101,7 @@ def main():
             unique_villages = village_df["Village Code"].nunique()
             st.metric(label="**Villages**", value=unique_villages)
     except Exception as e:
-        st.error(f"error in KPI,{e}")
+        st.error(f"error occur in KPI,{e}")
         pass
 
     try:
@@ -361,11 +361,11 @@ def main():
 
     try:
         top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
-        fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+        # fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
         # fig.update_layout(title='Top 10 States most Districts')
-        fig.update_traces(hole=0.6)
-        with col1:
-            st.plotly_chart(fig)
+        # fig.update_traces(hole=0.6)
+        # with col1:
+        #     st.plotly_chart(fig)
     except Exception as e:
         st.error(f"an error occur,{e}")
         pass
