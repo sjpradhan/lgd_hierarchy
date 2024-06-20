@@ -353,7 +353,7 @@ def main():
     stats_table = loading_village_data()
 
     st.table(stats_table)
-    st.caption("Update till June 2024, To get latest LGD Data Please visit LGD Official site.")
+    st.caption("**Update till June 2024, To get latest LGD Data Please visit LGD Official site.**")
 
     st.divider()
 
@@ -378,16 +378,7 @@ def main():
         )
         st.plotly_chart(fig)
 
-    top_villages = stats_table[['States', 'Villages']].sort_values(by='Villages', ascending=False).head(10)
 
-    fig = go.Figure(data=[go.Bar(x=top_villages['States'], y=top_villages['Villages'])])
-    fig.update_layout(
-        title='Top 10 States by most Villages',
-        xaxis_title='States',
-        yaxis_title='Number of Villages'
-    )
-
-    st.plotly_chart(fig)
 
 # Footer
     st.markdown(
