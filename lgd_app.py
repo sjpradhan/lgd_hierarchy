@@ -413,20 +413,17 @@ def main():
     # Icons
     st.markdown(
         """
-        <script>
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-        </script>
-        <div class="footer">
-            <a href="https://github.com/sjpradhan"><img src=https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/github-logo.png width="30" height="30"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="mailto:sjpradan@gmail.com"><img src=https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/gmail.png width="30" height="30"></a>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <a href="https://www.linkedin.com/in/sjpradhan"><img src=https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/linkedin.png width="30" height="30"></a>
+        <div class="footer" style="display: flex; justify-content: center; align-items: center;">
+                <div style="display: inline-block;">
+                    <a href="https://github.com/sjpradhan"><img src="https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/github-logo.png" width="30" height="30"></a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="mailto:sjpradan@gmail.com"><img src="https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/gmail.png" width="30" height="30"></a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="https://www.linkedin.com/in/sjpradhan"><img src="https://raw.githubusercontent.com/sjpradhan/repo/master/Icons/linkedin.png" width="30" height="30"></a>
+                <div style="text-align: center;">
+                    <p style="margin: 0;">© 2024 Sj Pradhan. All rights reserved.</p>
+                </div>
+            </div>
         </div>
         """
         , unsafe_allow_html=True
