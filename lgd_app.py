@@ -306,70 +306,74 @@ def main():
 
     st.subheader(":orange[State Wise Records📈]", divider="rainbow")
 
-    @st.cache_data
-    def loading_district_data():
-        district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/District%20Details.csv"
-        district_df = pd.read_csv(district_url)
-        district_df["Hierarchy"] = district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
-            0).str.strip()
-        districts_count = district_df["Hierarchy"].value_counts().reset_index()
-        return districts_count
-    districts_count = loading_district_data()
+    try:
+        @st.cache_data
+        def loading_district_data():
+            district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/District%20Details.csv"
+            district_df = pd.read_csv(district_url)
+            district_df["Hierarchy"] = district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
+                0).str.strip()
+            districts_count = district_df["Hierarchy"].value_counts().reset_index()
+            return districts_count
+        districts_count = loading_district_data()
 
-    @st.cache_data
-    def loading_sub_district_data():
-        sub_district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Sub-districts%20Details.csv"
-        sub_district_df = pd.read_csv(sub_district_url)
-        sub_district_df = sub_district_df[["Hierarchy"]]
-        sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
-            1).str.strip()
-        sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace("District\) / ", "", regex=True)
-        sub_district_count = sub_district_df["Hierarchy"].value_counts().reset_index()
-        replacements = {
-            "Bhabua)": "Bihar",
-            "East Nimar)": "Madhya Pradesh",
-            "West Nimar)": "Madhya Pradesh"
-        }
-        sub_district_count["Hierarchy"] = sub_district_count["Hierarchy"].replace(replacements)
-        sub_district_count = sub_district_count.groupby("Hierarchy")["count"].sum().reset_index()
-        return sub_district_count
-    sub_district_count = loading_sub_district_data()
+        @st.cache_data
+        def loading_sub_district_data():
+            sub_district_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Sub-districts%20Details.csv"
+            sub_district_df = pd.read_csv(sub_district_url)
+            sub_district_df = sub_district_df[["Hierarchy"]]
+            sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace(r"\(State\)", "").str.split("(").str.get(
+                1).str.strip()
+            sub_district_df["Hierarchy"] = sub_district_df["Hierarchy"].str.replace("District\) / ", "", regex=True)
+            sub_district_count = sub_district_df["Hierarchy"].value_counts().reset_index()
+            replacements = {
+                "Bhabua)": "Bihar",
+                "East Nimar)": "Madhya Pradesh",
+                "West Nimar)": "Madhya Pradesh"
+            }
+            sub_district_count["Hierarchy"] = sub_district_count["Hierarchy"].replace(replacements)
+            sub_district_count = sub_district_count.groupby("Hierarchy")["count"].sum().reset_index()
+            return sub_district_count
+        sub_district_count = loading_sub_district_data()
 
-    @st.cache_data
-    def loading_village_data():
-        village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
-        village_df = pd.read_csv(village_url)
-        village_df = village_df[["State Name (In English)"]]
-        village_count = village_df["State Name (In English)"].value_counts().reset_index()
+        @st.cache_data
+        def loading_village_data():
+            village_url = "https://media.githubusercontent.com/media/sjpradhan/lgd_hierarchy/main/Data/Village%20Details.csv"
+            village_df = pd.read_csv(village_url)
+            village_df = village_df[["State Name (In English)"]]
+            village_count = village_df["State Name (In English)"].value_counts().reset_index()
 
-        df_merge = pd.merge(districts_count, sub_district_count, how="left", on="Hierarchy")
-        df_merge = pd.merge(df_merge, village_count, how="left", left_on="Hierarchy", right_on="State Name (In English)")
-        stats_table = df_merge[["Hierarchy", "count_x", "count_y", "count"]]
-        stats_table["count"].fillna(0, inplace=True)
-        stats_table["count"] = stats_table["count"].astype(int)
-        rename_column = ["States", "Districts", "Sub-Districts", "Villages"]
-        stats_table.columns = rename_column
-        return stats_table
-    stats_table = loading_village_data()
+            df_merge = pd.merge(districts_count, sub_district_count, how="left", on="Hierarchy")
+            df_merge = pd.merge(df_merge, village_count, how="left", left_on="Hierarchy", right_on="State Name (In English)")
+            stats_table = df_merge[["Hierarchy", "count_x", "count_y", "count"]]
+            stats_table["count"].fillna(0, inplace=True)
+            stats_table["count"] = stats_table["count"].astype(int)
+            rename_column = ["States", "Districts", "Sub-Districts", "Villages"]
+            stats_table.columns = rename_column
+            return stats_table
+        stats_table = loading_village_data()
 
-    st.table(stats_table)
-    st.caption("**Update till June 2024, To get latest LGD Data Please visit LGD Official site.**")
+        st.table(stats_table)
+        st.caption("**Update till June 2024, To get latest LGD Data Please visit LGD Official site.**")
+    except Exception as e:
+        st.error(f"error in table data,{e}")
+        pass
 
     st.divider()
 
-    col1,col2 = st.columns(2)
+    # col1,col2 = st.columns(2)
 
-    try:
-        top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
-        # st.write(top_dist)
-        fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
-        fig.update_layout(title='Top 10 States most Districts')
-        fig.update_traces(hole=0.6)
-        with col1:
-            st.plotly_chart(fig)
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-        pass
+    # try:
+    #     top_dist = stats_table[['States', 'Districts']].sort_values(by='Districts', ascending=False).head(5)
+    #     # st.write(top_dist)
+    #     fig = go.Figure(data=[go.Pie(labels=top_dist['States'], values=top_dist['Districts'], hole=0.5)])
+    #     fig.update_layout(title='Top 10 States most Districts')
+    #     fig.update_traces(hole=0.6)
+    #     with col1:
+    #         st.plotly_chart(fig)
+    # except Exception as e:
+    #     st.error(f"An error occurred: {e}")
+    #     pass
     #
     # top_sub_dist = stats_table[['States', 'Sub-Districts']].sort_values(by='Sub-Districts', ascending=False).head(5)
     # fig = go.Figure(data=[go.Pie(labels=top_sub_dist['States'], values=top_sub_dist['Sub-Districts'], hole=0.5)])
