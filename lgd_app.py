@@ -191,7 +191,8 @@ def main():
         if search_term:
             filtered_records = district_df[
                 district_df['District Name (In English)'].str.contains(search_term, case=False) |
-                district_df['District LGD Code'].astype(str).str.contains(search_term)
+                district_df['District LGD Code'].astype(str).str.contains(search_term) |
+                district_df['Hierarchy'].str.contains(search_term, case=False)
                 ]
 
             # If there is invalid search it will show no matching found
@@ -237,7 +238,8 @@ def main():
         if search_term:
             filtered_records = sub_district_df[
                 sub_district_df['Sub-District Name (In English)'].str.contains(search_term, case=False) |
-                sub_district_df['Sub-District LGD Code'].astype(str).str.contains(search_term)
+                sub_district_df['Sub-District LGD Code'].astype(str).str.contains(search_term) |
+                sub_district_df['Hierarchy'].astype(str).str.contains(search_term, case=False)
                 ]
 
             # If there is invalid search it will show no matching found
@@ -285,7 +287,13 @@ def main():
         if search_term:
             filtered_records = village_df[
                 village_df['Village Name (In English)'].str.contains(search_term, case=False) |
-                village_df['Village Code'].astype(str).str.contains(search_term)
+                village_df['Village Code'].astype(str).str.contains(search_term) |
+                village_df['State Code'].astype(str).str.contains(search_term) |
+                village_df['State Name (In English)'].str.contains(search_term, case=False) |
+                village_df['District Code'].astype(str).str.contains(search_term) |
+                village_df['District Name (In English)'].str.contains(search_term, case=False) |
+                village_df['Sub-District Code'].astype(str).str.contains(search_term) |
+                village_df['Sub-District Name (In English)'].str.contains(search_term, case=False)
                 ]
 
             # If there is invalid search it will show no matching found
