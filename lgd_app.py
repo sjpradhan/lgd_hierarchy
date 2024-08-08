@@ -17,7 +17,7 @@ def main():
 
     st.set_page_config(page_title="LGD Search Hierarchy", page_icon=image)
 
-    st.title(":rainbow[LGD Hierarchy Data]🗺️")
+    st.title(":rainbow[LGD Hierarchy Data & Area Unit Converter]🗺️")
 
     try:
         st.markdown(
@@ -45,7 +45,69 @@ def main():
 
     except Exception as e:
         pass
+    # Conversion factors from each unit to square meters
+    conversion_factors = {
+        "Acre": 4046.86,
+        "Hectare": 10000,
+        "Bigha": 1337.8,
+        "Square meter": 1,
+        "Square feet": 0.092903,
+        "Biswa": 125.42,
+        "Guntha": 101.17,
+        "Square yard": 0.836127,
+        "Cent": 40.4686,
+        "Ground": 222.967,
+        "Biswani": 50.93,
+        "Dhur": 16.929,
+        "Kanal": 505.857,
+        "Katha": 126.441,
+        "Chatak": 33.528,
+        "Ghumao": 24281.13,
+        "Killa": 4046.86,
+        "Ankanam": 2.323,
+        "Decimal": 40.4686
+    }
 
+    # Function to convert from one unit to another
+    def convert_area(value, from_unit, to_unit):
+        value_in_sq_meters = value * conversion_factors[from_unit]
+        return value_in_sq_meters / conversion_factors[to_unit]
+
+    st.header(":rainbow[Area Unit Converter]")
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.subheader(":orange[Choose Unit]🤔")
+        from_unit = st.selectbox("From unit:", list(conversion_factors.keys()))
+        to_unit = st.selectbox("To unit:", list(conversion_factors.keys()))
+        value = st.number_input("Enter the area value:", min_value=0.0, format="%.2f", step=1.0)
+        # Perform the conversion
+        converted_value = convert_area(value, from_unit, to_unit)
+
+    with col2:
+        # Add a slider to adjust the input value dynamically
+        slider_value = st.slider("Adjust the area value:", min_value=0.0, max_value=10.0, value=0.0, step=0.1)
+        if slider_value > 0:
+            slider_converted_value = convert_area(slider_value, from_unit, to_unit)
+            st.write(f"{slider_value} {from_unit} is equal to {slider_converted_value:.6f} {to_unit}")
+
+    # Enable real-time updates
+    if st.button("Convert"):
+        st.write(f"{value} {from_unit} is equal to {converted_value:.6f} {to_unit}")
+
+    # Add a table to show multiple conversions at once if there is a valid input value
+    if value > 0:
+        st.subheader(":orange[Multiple Conversions📔]")
+        conversion_results = {unit: convert_area(value, from_unit, unit) for unit in conversion_factors.keys()}
+        conversion_df = pd.DataFrame.from_dict(conversion_results, orient='index', columns=['Converted Value'])
+        conversion_df['Converted Value'] = conversion_df['Converted Value'].astype(str)
+        conversion_df.reset_index(inplace=True)
+        conversion_df.rename(columns={'index': 'Unit Type'}, inplace=True)
+        st.table(conversion_df)
+
+    st.header(":rainbow[Local Directory Data (LGD)]")
+    st.subheader(":orange[KPI⚡]")
     st.divider()
 
     try:
